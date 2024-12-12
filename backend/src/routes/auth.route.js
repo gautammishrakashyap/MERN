@@ -11,5 +11,6 @@ router.post("/login", login);
 
 // POST route for logout
 router.post("/logout", logout);
+router.put("/update-profile", protectRoute, updateProfile)
 
 export default router;
