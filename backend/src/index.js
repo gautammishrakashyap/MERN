@@ -10,9 +10,11 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware to parse incoming JSON requests
 app.use(express.json());
+// app.use(cookieParser());
 
 // Define routes
 app.use("/api/auth", authRoutes);
+// app.use("/api/message", messageRoutes)
 
 // Start the server and connect to the database
 app.listen(PORT, () => {
