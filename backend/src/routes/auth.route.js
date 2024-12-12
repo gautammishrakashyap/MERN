@@ -1,16 +1,15 @@
 import express from "express";
-import { signup, login, logout } from "../controllers/auth.controllers.js"; // Ensure .js extension
+import { checkAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js";
+import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// POST route for signup
 router.post("/signup", signup);
-
-// POST route for login
 router.post("/login", login);
-
-// POST route for logout
 router.post("/logout", logout);
-router.put("/update-profile", protectRoute, updateProfile)
+
+router.put("/update-profile", protectRoute, updateProfile);
+
+router.get("/check", protectRoute, checkAuth);
 
 export default router;
