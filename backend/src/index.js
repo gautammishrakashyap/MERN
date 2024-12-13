@@ -1,36 +1,42 @@
 import express from "express";
 import dotenv from "dotenv";
-import authRoutes from "./routes/auth.route.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+
+import path from "path";
+
 import { connectDB } from "./lib/db.js";
-// import messageRoutes from "./routes/message.route.js"
+
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js";
+import { app, server } from "./lib/socket.js";
 
 dotenv.config();
-const app = express();
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT;
+const __dirname = path.resolve();
 
-// Middleware to parse incoming JSON requests
 app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
-// Define routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/message", messageRoutes)
+app.use("/api/messages", messageRoutes);
 
-// Start the server and connect to the database
-app.listen(PORT, () => {
-    console.log(`Server is running on PORT~ ${PORT}`);
-    connectDB();
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-// Handle unhandled promise rejections
-process.on("unhandledRejection", (err, promise) => {
-    console.log(`Error: ${err.message}`);
-    app.close(() => process.exit(1));
-});
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
+}
 
-// Handle uncaught exceptions
-process.on("uncaughtException", (err) => {
-    console.log(`Error: ${err.message}`);
-    app.close(() => process.exit(1));
+server.listen(PORT, () => {
+  console.log("server is running on PORT:" + PORT);
+  connectDB();
 });
